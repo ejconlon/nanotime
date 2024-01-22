@@ -1,0 +1,44 @@
+name: nanotime
+version: 0.1.0
+
+github: ejconlon/nanotime
+license: BSD3
+author: Eric Conlon
+maintainer: ejconlon@gmail.com
+copyright: (c) 2024 Eric Conlon
+synopsis: a tiny time library
+description: Please see the README on GitHub at <https://github.com/ejconlon/nanotime#readme>
+tested-with: GHC == 9.6.4
+
+defaults:
+  local: ../defaults.yaml
+
+dependencies:
+- base >= 4.12 && < 5
+
+library:
+  source-dirs: src
+
+executables:
+  nanotime-exe:
+    main: Main.hs
+    source-dirs: exe
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - nanotime
+
+tests:
+  nanotime-test:
+    main: Main.hs
+    source-dirs: test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - nanotime
+    - tasty
+    - tasty-hunit
