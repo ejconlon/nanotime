@@ -55,7 +55,7 @@ timeDeltaFromFracSecs d = TimeDelta (round (1000000000 * toRational (assertingNo
 timeDeltaFromNanos :: (Integral a, Show a) => a -> TimeDelta
 timeDeltaFromNanos = TimeDelta . fromIntegral . assertingNonNegative
 
-timeDeltaToFracSecs :: Fractional a => TimeDelta -> a
+timeDeltaToFracSecs :: (Fractional a) => TimeDelta -> a
 timeDeltaToFracSecs (TimeDelta n) = fromIntegral n / 1000000000
 
 timeDeltaToNanos :: TimeDelta -> Word64
@@ -77,12 +77,12 @@ diffTimeDelta (TimeDelta big) (TimeDelta small) =
 threadDelayDelta :: TimeDelta -> IO ()
 threadDelayDelta (TimeDelta td) = threadDelay (fromIntegral (div td 1000))
 
-class Ord t => TimeLike t where
+class (Ord t) => TimeLike t where
   diffTime :: t -> t -> Maybe TimeDelta
   addTime :: t -> TimeDelta -> t
   currentTime :: IO t
 
-awaitDelta :: TimeLike t => t -> TimeDelta -> IO t
+awaitDelta :: (TimeLike t) => t -> TimeDelta -> IO t
 awaitDelta m t = do
   let target = addTime m t
   cur <- currentTime
@@ -118,7 +118,7 @@ monoTimeFromFracSecs d = MonoTime (round (1000000000 * toRational (assertingNonN
 monoTimeFromNanos :: (Integral a, Show a) => a -> MonoTime
 monoTimeFromNanos = MonoTime . fromIntegral . assertingNonNegative
 
-monoTimeToFracSecs :: Fractional a => MonoTime -> a
+monoTimeToFracSecs :: (Fractional a) => MonoTime -> a
 monoTimeToFracSecs (MonoTime n) = fromIntegral n / 1000000000
 
 monoTimeToNanos :: MonoTime -> Word64
@@ -170,4 +170,3 @@ instance TimeLike NtpTime where
   diffTime n2 n1 = diffTime (ntpToPosix n2) (ntpToPosix n1)
   addTime n d = posixToNtp (addTime (ntpToPosix n) d)
   currentTime = fmap posixToNtp currentTime
-
