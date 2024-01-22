@@ -15,20 +15,10 @@ defaults:
 
 dependencies:
 - base >= 4.12 && < 5
+- time >= 1.12 && < 1.14
 
 library:
   source-dirs: src
-
-executables:
-  nanotime-exe:
-    main: Main.hs
-    source-dirs: exe
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - nanotime
 
 tests:
   nanotime-test:

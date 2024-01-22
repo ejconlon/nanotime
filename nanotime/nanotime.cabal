@@ -24,7 +24,7 @@ source-repository head
 
 library
   exposed-modules:
-      Nanotime.Main
+      Nanotime
   other-modules:
       Paths_nanotime
   hs-source-dirs:
@@ -61,47 +61,7 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fno-warn-unused-top-binds
   build-depends:
       base >=4.12 && <5
-  default-language: GHC2021
-
-executable nanotime-exe
-  main-is: Main.hs
-  other-modules:
-      Paths_nanotime
-  hs-source-dirs:
-      exe
-  default-extensions:
-      BangPatterns
-      ConstraintKinds
-      DataKinds
-      DeriveFunctor
-      DeriveFoldable
-      DeriveGeneric
-      DeriveTraversable
-      DerivingStrategies
-      DerivingVia
-      FlexibleContexts
-      FlexibleInstances
-      FunctionalDependencies
-      GADTs
-      GeneralizedNewtypeDeriving
-      ImportQualifiedPost
-      LambdaCase
-      KindSignatures
-      MultiParamTypeClasses
-      MultiWayIf
-      PatternSynonyms
-      Rank2Types
-      ScopedTypeVariables
-      StandaloneDeriving
-      StandaloneKindSignatures
-      TupleSections
-      TypeApplications
-      TypeOperators
-      TypeFamilies
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fno-warn-unused-top-binds -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      base >=4.12 && <5
-    , nanotime
+    , time >=1.12 && <1.14
   default-language: GHC2021
 
 test-suite nanotime-test
@@ -146,4 +106,5 @@ test-suite nanotime-test
     , nanotime
     , tasty
     , tasty-hunit
+    , time >=1.12 && <1.14
   default-language: GHC2021
