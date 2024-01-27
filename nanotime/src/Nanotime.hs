@@ -148,8 +148,8 @@ timeDeltaToNanos (TimeDelta s m) =
 threadDelayDelta :: TimeDelta -> IO ()
 threadDelayDelta (TimeDelta s m) =
   case s of
-    SignNeg -> pure ()
-    SignPos -> threadDelay (fromIntegral (div m 1000))
+    SignPos | m > 0 -> threadDelay (fromIntegral (div m 1000))
+    _ -> pure ()
 
 class (Ord t) => TimeLike t where
   -- | `diffTime end start` computes `end - start`
