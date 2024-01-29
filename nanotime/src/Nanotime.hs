@@ -139,11 +139,8 @@ timeDeltaToFracSecs (TimeDelta s m) =
         SignPos -> a
         SignNeg -> negate a
 
-timeDeltaToNanos :: TimeDelta -> Maybe Word64
-timeDeltaToNanos (TimeDelta s m) =
-  case s of
-    SignNeg -> Nothing
-    SignPos -> Just m
+timeDeltaToNanos :: TimeDelta -> (Sign, Word64)
+timeDeltaToNanos (TimeDelta s m) = (s, m)
 
 threadDelayDelta :: TimeDelta -> IO ()
 threadDelayDelta (TimeDelta s m) =
