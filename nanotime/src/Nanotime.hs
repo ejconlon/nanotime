@@ -6,9 +6,11 @@ module Nanotime
   , timeDeltaToFracSecs
   , timeDeltaToNanos
   , threadDelayDelta
+  , showTimeDelta
   , TimeLike (..)
   , awaitDelta
   , PosixTime (..)
+  , showPosixTime
   , MonoTime (..)
   , monoTimeToFracSecs
   , monoTimeToNanos
@@ -23,11 +25,14 @@ where
 import Control.Concurrent (threadDelay)
 import Data.Bits (Bits (..))
 import Data.Fixed (Fixed (..), Pico)
+import Data.Ratio ((%))
 import Data.Time.Clock (nominalDiffTimeToSeconds)
-import Data.Time.Clock.POSIX (getPOSIXTime)
+import Data.Time.Clock.POSIX (getPOSIXTime, posixSecondsToUTCTime)
+import Data.Time.Format.ISO8601 (iso8601Show)
 import Data.Word (Word32, Word64)
 import GHC.Clock (getMonotonicTimeNSec)
 import GHC.Stack (HasCallStack)
+import Numeric (showFFloat)
 
 -- | Sign (negative or positive) of a magnitude of time difference
 data Sign = SignNeg | SignPos
@@ -148,6 +153,12 @@ threadDelayDelta (TimeDelta s m) =
     SignPos | m > 0 -> threadDelay (fromIntegral (div m 1000))
     _ -> pure ()
 
+-- | Show a 'TimeDelta' as a fractional second with the given number
+-- of decimal places for debugging
+showTimeDelta :: Int -> TimeDelta -> String
+showTimeDelta places td = showFFloat @Double (Just places) (timeDeltaToFracSecs td) ""
+
+-- | 'MonoTime', 'PosixTime', and 'NtpTime' act similarly
 class (Ord t) => TimeLike t where
   -- | `diffTime end start` computes `end - start`
   diffTime :: t -> t -> TimeDelta
@@ -155,6 +166,7 @@ class (Ord t) => TimeLike t where
   -- | `addTime start (diffTime end start) == end`
   addTime :: t -> TimeDelta -> t
 
+  -- | Get the current time in the desired type
   currentTime :: IO t
 
 awaitDelta :: (TimeLike t) => t -> TimeDelta -> IO t
@@ -165,7 +177,13 @@ awaitDelta m t = do
   target <$ threadDelayDelta td
 
 newtype PosixTime = PosixTime {unPosixTime :: Word64}
-  deriving stock (Eq, Show, Ord, Bounded)
+  deriving stock (Show)
+  deriving newtype (Eq, Ord, Bounded, Num)
+
+-- | Show 'PosixTime' as a UTC ISO-8601 String for debugging
+showPosixTime :: PosixTime -> String
+showPosixTime (PosixTime ns) =
+  iso8601Show (posixSecondsToUTCTime (fromRational (fromIntegral ns % 1000000000)))
 
 -- private
 e9W :: Word64
@@ -182,7 +200,8 @@ instance TimeLike PosixTime where
 
 -- | Monotonic time in nanoseconds since some unspecified epoch (see 'getMonotonicTimeNs')
 newtype MonoTime = MonoTime {unMonoTime :: Word64}
-  deriving stock (Eq, Show, Ord, Bounded)
+  deriving stock (Show)
+  deriving newtype (Eq, Ord, Bounded, Num)
 
 monoTimeFromFracSecs :: (Real a, Show a) => a -> MonoTime
 monoTimeFromFracSecs d = MonoTime (round (1000000000 * toRational (assertingNonNegative d)))
@@ -202,7 +221,8 @@ instance TimeLike MonoTime where
   currentTime = fmap MonoTime getMonotonicTimeNSec
 
 newtype NtpTime = NtpTime {unNtpTime :: Word64}
-  deriving stock (Eq, Show, Ord, Bounded)
+  deriving stock (Show)
+  deriving newtype (Eq, Ord, Bounded, Num)
 
 -- private
 nanoWordToSplit :: Word64 -> (Word32, Word32)
