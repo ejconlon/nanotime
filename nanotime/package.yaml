@@ -1,5 +1,5 @@
 name: nanotime
-version: 0.3.2
+version: 0.3.3
 
 github: ejconlon/nanotime
 license: BSD3
@@ -15,7 +15,7 @@ defaults:
 
 dependencies:
 - base >= 4.12 && < 5
-- time >= 1.12 && < 1.14
+- time >= 1.12 && < 1.15
 
 library:
   source-dirs: src
